@@ -28,10 +28,9 @@ async function screenshotPage (_options) {
     waitUntil: 'domcontentloaded'
   })
 
-  const path = `./public/${makeUniq()}.jpeg`
-
   await sleep(options.timeout)
 
+  const path = `./public/${makeUniq()}.jpeg`
   await page.screenshot({
     path,
     quality: options.quality
