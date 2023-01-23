@@ -2,7 +2,8 @@
 const Koa = require('koa')
 const Router = require('@koa/router')
 const mime = require('mime-types')
-const fs = require('fs')
+const Promise = require('bluebird')
+const fs = Promise.promisifyAll(require('fs'))
 const Joi = require('joi')
 
 const { screenshotPage } = require('./helpers')
@@ -41,6 +42,8 @@ router.get('/', async (ctx, next) => {
   ctx.response.set('content-type', mimeType)
 
   ctx.body = src
+
+  await fs.unlinkAsync(path)
 })
 
 app
