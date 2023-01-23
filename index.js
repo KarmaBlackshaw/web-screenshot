@@ -7,7 +7,7 @@ async function screenshotPage (_options) {
     width: 1182,
     height: 885,
     timeout: 1000,
-    quality: 100
+    quality: 50
   }, _options)
 
   const browser = await puppeteer.launch({
@@ -30,11 +30,11 @@ async function screenshotPage (_options) {
 
   const path = `./public/${makeUniq()}.jpeg`
 
-  await sleep(5000)
+  await sleep(options.timeout)
 
   await page.screenshot({
     path,
-    quality: 50
+    quality: options.quality
   })
 
   await page.close()
