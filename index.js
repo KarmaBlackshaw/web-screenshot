@@ -1,4 +1,3 @@
-
 const puppeteer = require('puppeteer')
 
 const { makeUniq, sleep } = require('./helpers')
