@@ -1,47 +1,48 @@
-const puppeteer = require('puppeteer')
 
-const { makeUniq, sleep } = require('./helpers')
+const Koa = require('koa')
+const Router = require('@koa/router')
+const mime = require('mime-types')
+const fs = require('fs')
+const Joi = require('joi')
 
-async function screenshotPage (_options) {
-  const options = Object.assign({
-    width: 1182,
-    height: 885,
-    timeout: 1000,
-    quality: 50
-  }, _options)
+const { screenshotPage } = require('./helpers')
 
-  const browser = await puppeteer.launch({
-    headless: true,
-    defaultViewport: {
-      width: 1182,
-      height: 885
-    },
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox'
-    ]
+const app = new Koa()
+const router = new Router()
+
+router.get('/', async (ctx, next) => {
+  const schema = Joi.object({
+    url: Joi.string()
+      .optional(),
+    quality: Joi.number()
+      .optional(),
+    width: Joi.number()
+      .optional(),
+    height: Joi.number()
+      .optional(),
+    timeout: Joi.number()
+      .optional()
   })
 
-  const page = await browser.newPage()
+  const data = await schema.validateAsync(ctx.request.query)
 
-  await page.goto(options.url, {
-    waitUntil: 'domcontentloaded'
+  const path = await screenshotPage({
+    url: data.url,
+    quality: data.quality,
+    width: data.width,
+    height: data.height,
+    timeout: data.timeout
   })
 
-  await sleep(options.timeout)
+  const mimeType = mime.lookup(path)
 
-  const path = `./public/${makeUniq()}.jpeg`
-  await page.screenshot({
-    path,
-    quality: options.quality
-  })
+  const src = fs.createReadStream(path)
 
-  await page.close()
+  ctx.response.set('content-type', mimeType)
 
-  return path
-}
-
-screenshotPage({
-  url: 'https://jeash.tech',
-  quality: 2
+  ctx.body = src
 })
+
+app
+  .use(router.routes())
+  .listen(8000)
