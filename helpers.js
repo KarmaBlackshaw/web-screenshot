@@ -34,10 +34,9 @@ async function screenshotPage (_options) {
     height: 885,
     timeout: 1000,
     quality: 100,
-    fullPage: false
+    fullPage: false,
+    name: makeUniq()
   })
-
-  console.log(options)
 
   const browser = await puppeteer.launch({
     headless: true,
@@ -61,7 +60,7 @@ async function screenshotPage (_options) {
 
   await autoScroll(page)
 
-  const path = `./public/${makeUniq()}.jpeg`
+  const path = `./public/${options.name}.jpeg`
   await page.screenshot({
     path,
     fullPage: options.fullPage,
