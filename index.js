@@ -1,3 +1,4 @@
+require('dotenv').config()
 
 const Koa = require('koa')
 const Router = require('@koa/router')
@@ -22,6 +23,8 @@ router.get('/', async (ctx, next) => {
     height: Joi.number()
       .optional(),
     timeout: Joi.number()
+      .optional(),
+    fullPage: Joi.number()
       .optional()
   })
 
@@ -32,7 +35,8 @@ router.get('/', async (ctx, next) => {
     quality: data.quality,
     width: data.width,
     height: data.height,
-    timeout: data.timeout
+    timeout: data.timeout,
+    fullPage: data.fullPage
   })
 
   const mimeType = mime.lookup(path)
@@ -48,4 +52,6 @@ router.get('/', async (ctx, next) => {
 
 app
   .use(router.routes())
-  .listen(8000)
+  .listen(process.env.PORT)
+
+console.log(`App running in port http://localhost:${process.env.PORT}`)
