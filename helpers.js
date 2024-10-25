@@ -1,5 +1,7 @@
 const puppeteer = require('puppeteer')
 const _ = require('lodash')
+const path = require('path')
+const { getUnixTime, add } = require('date-fns')
 
 function makeUniq (str = '') {
   return str + Date.now().toString(36) + Math.random().toString(36).slice(2)
@@ -34,8 +36,10 @@ async function screenshotPage (_options) {
     height: 885,
     timeout: 1000,
     quality: 100,
-    fullPage: false,
-    name: makeUniq()
+    fullPage: true,
+    name: getUnixTime(add(new Date(), {
+      days: 1
+    }))
   })
 
   const browser = await puppeteer.launch({
@@ -60,16 +64,17 @@ async function screenshotPage (_options) {
 
   await autoScroll(page)
 
-  const path = `./public/${options.name}.jpeg`
+  const imagePath = path.join(process.cwd(), 'public', `${options.name}.jpeg`)
+
   await page.screenshot({
-    path,
+    path: imagePath,
     fullPage: options.fullPage,
     quality: options.quality
   })
 
   await page.close()
 
-  return path
+  return imagePath
 }
 
 module.exports = {

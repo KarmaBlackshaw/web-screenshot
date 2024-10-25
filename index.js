@@ -7,6 +7,9 @@ const Promise = require('bluebird')
 const fs = Promise.promisifyAll(require('fs'))
 const Joi = require('joi')
 
+// jobs
+const jobs = require('./jobs')
+
 const { screenshotPage } = require('./helpers')
 
 const app = new Koa()
@@ -47,8 +50,10 @@ router.get('/', async (ctx, next) => {
 
   ctx.body = src
 
-  await fs.unlinkAsync(path)
+  ctx.status = 200
 })
+
+jobs()
 
 app
   .use(router.routes())
